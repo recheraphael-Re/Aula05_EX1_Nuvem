@@ -1,0 +1,699 @@
+<title>Relatório Docker Java 21</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=JetBrains+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root{
+    --paper:#F4F6F8; --surface:#FFFFFF; --ink:#111820; --ink2:#48545F; --ink3:#77838F;
+    --line:#DBE1E7; --line2:#C0C9D2;
+    --azul:#0B4E86; --azul-soft:#E3EDF5;
+    --term-bg:#0F1821; --term-fg:#D3DFE9; --term-dim:#76889A; --term-prompt:#62C58C;
+    --ok:#1C7448;
+    --shadow:0 1px 2px rgba(17,24,32,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0D1319; --surface:#151D25; --ink:#E5EBF1; --ink2:#A6B2BE; --ink3:#7A8794;
+      --line:#27313B; --line2:#3A4551;
+      --azul:#6FB3EC; --azul-soft:#15283A;
+      --term-bg:#070B10; --term-fg:#CBD8E4; --term-dim:#6D7E8E; --term-prompt:#5FC98D;
+      --ok:#4FC085;
+      --shadow:0 1px 2px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0D1319; --surface:#151D25; --ink:#E5EBF1; --ink2:#A6B2BE; --ink3:#7A8794;
+    --line:#27313B; --line2:#3A4551;
+    --azul:#6FB3EC; --azul-soft:#15283A;
+    --term-bg:#070B10; --term-fg:#CBD8E4; --term-dim:#6D7E8E; --term-prompt:#5FC98D;
+    --ok:#4FC085;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size:17px; line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px; margin:0 auto; padding:48px 24px 96px; display:flex; flex-direction:column; gap:44px}
+  p,li{max-width:66ch}
+  p{margin:0}
+
+  .head{display:flex; flex-direction:column; gap:20px; border-bottom:2px solid var(--ink); padding-bottom:24px}
+  .eyebrow{
+    font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:11.5px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--azul);
+  }
+  h1{
+    font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:41px; line-height:1.08;
+    margin:0; letter-spacing:-.015em; text-wrap:balance;
+  }
+  .dek{color:var(--ink2); font-size:18px}
+  .meta{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px 26px;
+    border-top:1px solid var(--line); padding-top:18px;
+  }
+  .meta div{display:flex; flex-direction:column; gap:2px}
+  .mlabel{
+    font-family:"Archivo",system-ui,sans-serif; font-size:10.5px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink3);
+  }
+  .mval{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:13.5px; color:var(--ink)}
+
+  .nota{
+    background:var(--azul-soft); border-left:3px solid var(--azul);
+    padding:14px 18px; font-size:15.5px; color:var(--ink2); max-width:none;
+  }
+  .nota strong{color:var(--ink)}
+
+  section{display:flex; flex-direction:column; gap:22px}
+  h2{
+    font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:26px; line-height:1.2;
+    margin:0; letter-spacing:-.01em; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+  }
+  h2 .num{
+    font-size:13px; font-weight:600; color:var(--azul); letter-spacing:.1em;
+    border:1px solid var(--line2); padding:3px 8px; white-space:nowrap;
+  }
+  h3{
+    font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:16px;
+    margin:0; letter-spacing:.005em;
+  }
+  h3 .letra{color:var(--azul); font-family:"JetBrains Mono",monospace; font-size:14px; margin-right:7px}
+  .bloco{display:flex; flex-direction:column; gap:12px}
+  .sub{font-size:15.5px; color:var(--ink2)}
+
+  .arquivo{border:1px solid var(--line); background:var(--surface); box-shadow:var(--shadow); margin:0}
+  .arquivo > figcaption{
+    font-family:"JetBrains Mono",monospace; font-size:12.5px; font-weight:600; color:var(--ink2);
+    padding:9px 14px; border-bottom:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:center; gap:12px;
+  }
+  .arquivo > figcaption span{font-family:"Archivo",sans-serif; font-weight:600; font-size:10.5px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--ink3)}
+  pre{
+    margin:0; padding:16px 18px; overflow-x:auto;
+    font-family:"JetBrains Mono",ui-monospace,monospace; font-size:12.8px; line-height:1.6;
+    color:var(--ink); tab-size:4;
+  }
+  code{font-family:"JetBrains Mono",ui-monospace,monospace; font-size:.88em}
+  p code,li code{background:var(--azul-soft); padding:1px 5px; color:var(--ink)}
+
+  .term{background:var(--term-bg); border:1px solid var(--line2)}
+  .term > figcaption{
+    font-family:"Archivo",sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.11em;
+    text-transform:uppercase; color:var(--term-dim);
+    padding:10px 16px; border-bottom:1px solid rgba(255,255,255,.09);
+    display:flex; justify-content:space-between; gap:12px; align-items:center;
+  }
+  .term > figcaption span{color:var(--term-dim)}
+  .term pre{color:var(--term-fg); font-size:12.6px; padding:16px}
+  .term .pr{color:var(--term-prompt)}
+  .term .cm{color:#FFFFFF; font-weight:600}
+  .term .dim{color:var(--term-dim)}
+
+  .tree{
+    font-family:"JetBrains Mono",monospace; font-size:12.8px; line-height:1.75;
+    background:var(--surface); border:1px solid var(--line); padding:16px 18px;
+    overflow-x:auto; color:var(--ink2); margin:0;
+  }
+  .tree b{color:var(--ink); font-weight:600}
+
+  .diagrama{border:1px solid var(--line); background:var(--surface); padding:20px 16px; overflow-x:auto}
+  .diagrama svg{display:block; min-width:620px; width:100%; height:auto}
+  .dbox{fill:var(--azul-soft); stroke:var(--azul); stroke-width:1.2}
+  .dtxt{fill:var(--ink); font-family:"Archivo",sans-serif; font-size:13px; font-weight:600}
+  .dlink{stroke:var(--line2); stroke-width:1.4; fill:none}
+  .dlbl{fill:var(--ink3); font-family:"JetBrains Mono",monospace; font-size:10px}
+  .dhead{fill:var(--line2)}
+
+  .qa{display:flex; flex-direction:column; gap:26px; border-top:1px solid var(--line); padding-top:26px}
+  .q{display:flex; flex-direction:column; gap:8px}
+  .q h3{display:flex; gap:11px; align-items:baseline}
+  .q h3 .n{
+    font-family:"JetBrains Mono",monospace; font-size:13px; color:var(--azul); font-weight:600;
+    min-width:18px;
+  }
+  .q p{margin-left:29px}
+  .q ul{margin:2px 0 0 29px; padding-left:18px; color:var(--ink2); font-size:16px}
+  .q li{margin-bottom:5px}
+
+  .cks{display:flex; flex-direction:column; gap:9px; border-top:1px solid var(--line); padding-top:18px}
+  .ck{display:flex; gap:10px; align-items:baseline; font-size:16px}
+  .ck b{color:var(--ok); font-family:"JetBrains Mono",monospace; font-size:13px}
+  .ck span{color:var(--ink2)}
+
+  footer{
+    border-top:1px solid var(--line); padding-top:20px; color:var(--ink3); font-size:14px;
+    display:flex; flex-wrap:wrap; gap:6px 20px; justify-content:space-between;
+  }
+  @media (max-width:560px){ h1{font-size:32px} .wrap{padding:32px 18px 64px} }
+</style>
+
+<div class="wrap">
+
+  <header class="head">
+    <div class="eyebrow">SENAI &middot; Computação em Nuvem &middot; Aula 05</div>
+    <h1>Empacotando aplicações Java 21 em containers Docker</h1>
+    <p class="dek">Relatório das duas atividades práticas: o cadastro de produtos de uma pequena loja e o sistema orientado a objetos da CTI Insights, ambos compilados e executados dentro de containers.</p>
+    <div class="meta">
+      <div><span class="mlabel">Aluno</span><span class="mval">Raphael Reche</span></div>
+      <div><span class="mlabel">RA</span><span class="mval">26164063</span></div>
+      <div><span class="mlabel">Professor</span><span class="mval">Me. Daniel Vieira</span></div>
+      <div><span class="mlabel">Data</span><span class="mval">04/09/2026</span></div>
+      <div><span class="mlabel">Docker Engine</span><span class="mval">29.7.2 · a7dcaa6</span></div>
+      <div><span class="mlabel">Imagem base</span><span class="mval">eclipse-temurin:21-jdk</span></div>
+      <div><span class="mlabel">Host</span><span class="mval">Windows 11 Education</span></div>
+      <div><span class="mlabel">Imagens geradas</span><span class="mval">java-produtos · java-cti-insights</span></div>
+    </div>
+  </header>
+
+  <p class="nota"><strong>Sobre os registros de execução.</strong> Os blocos escuros deste relatório são a transcrição literal do terminal — comando digitado e saída obtida — de cada etapa realmente executada nesta máquina. Anexe ao lado de cada bloco o print de tela correspondente, exigido no item <em>f</em> do enunciado.</p>
+
+  <section>
+    <h2><span class="num">ATIVIDADE 1</span> Cadastro de produtos da loja</h2>
+    <p>Uma pequena loja precisa armazenar e exibir nome, preço e quantidade em estoque de cada produto. A modelagem usa uma única classe de domínio, <code>Produto</code>, instanciada três vezes pela <code>Main</code>.</p>
+
+    <div class="bloco">
+      <h3><span class="letra">d)</span>Estrutura da aplicação</h3>
+      <pre class="tree"><b>atividade-produtos/</b>
+│
+├── Produto.java
+├── Main.java
+└── Dockerfile</pre>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">a)</span>Classe Produto</h3>
+      <p class="sub">Três atributos, um construtor que os inicializa e o método <code>exibirProduto()</code>, que imprime as informações no terminal. O <code>Locale.US</code> no <code>printf</code> garante o ponto decimal do exemplo (R$ 3500.00) independentemente do idioma do sistema onde o container rodar.</p>
+      <figure class="arquivo">
+        <figcaption>Produto.java <span>Classe de domínio</span></figcaption>
+        <pre>import java.util.Locale;
+
+public class Produto {
+
+    String nome;
+    double preco;
+    int quantidade;
+
+    public Produto(String nome, double preco, int quantidade) {
+        this.nome = nome;
+        this.preco = preco;
+        this.quantidade = quantidade;
+    }
+
+    public void exibirProduto() {
+        System.out.println("Produto: " + nome);
+        System.out.printf(Locale.US, "Preço: R$ %.2f%n", preco);
+        System.out.println("Quantidade: " + quantidade);
+        System.out.println();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">b)</span>Classe Main</h3>
+      <figure class="arquivo">
+        <figcaption>Main.java <span>Ponto de entrada</span></figcaption>
+        <pre>public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("=== ESTOQUE DA LOJA ===");
+        System.out.println();
+
+        Produto notebook = new Produto("Notebook", 3500.00, 5);
+        Produto mouse = new Produto("Mouse sem fio", 89.90, 40);
+        Produto monitor = new Produto("Monitor 24 polegadas", 1250.50, 12);
+
+        notebook.exibirProduto();
+        mouse.exibirProduto();
+        monitor.exibirProduto();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">c)</span>Dockerfile</h3>
+      <p class="sub">A compilação acontece na construção da imagem, e não na execução: o <code>javac</code> roda dentro do <code>RUN</code> e vira uma camada com os arquivos <code>.class</code> já prontos. Ao container resta apenas executar <code>java Main</code>.</p>
+      <figure class="arquivo">
+        <figcaption>Dockerfile <span>Receita da imagem</span></figcaption>
+        <pre># Imagem base com o JDK 21
+FROM eclipse-temurin:21-jdk
+
+# Diretorio de trabalho dentro do container
+WORKDIR /app
+
+# Copia os arquivos-fonte da maquina para dentro da imagem
+COPY Produto.java Main.java ./
+
+# Compila as classes durante a construcao da imagem
+RUN javac -encoding UTF-8 Produto.java Main.java
+
+# Comando executado quando o container e iniciado
+CMD ["java", "-Dstdout.encoding=UTF-8", "Main"]</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">e)</span>Criação da imagem e execução</h3>
+      <figure class="arquivo term">
+        <figcaption>Terminal — docker build <span>java-produtos</span></figcaption>
+        <pre><span class="pr">PS C:\Users\Instrutor\Aula05_EX1_Nuvem\atividade-produtos&gt;</span> <span class="cm">docker build -t java-produtos .</span>
+
+<span class="dim">#1 [internal] load build definition from Dockerfile
+#2 [internal] load metadata for docker.io/library/eclipse-temurin:21-jdk
+#5 [1/4] FROM docker.io/library/eclipse-temurin:21-jdk
+#6 [2/4] WORKDIR /app
+#6 CACHED
+#4 [internal] load build context
+#4 transferring context: 1.06kB done</span>
+#7 [3/4] COPY Produto.java Main.java ./
+#7 DONE 0.1s
+#8 [4/4] RUN javac -encoding UTF-8 Produto.java Main.java
+#8 DONE 1.5s
+#9 exporting to image
+<span class="dim">#9 exporting manifest sha256:60feefce9293319368918f94439ec1b1...</span>
+#9 naming to docker.io/library/java-produtos:latest done
+#9 DONE 0.5s</pre>
+      </figure>
+      <figure class="arquivo term">
+        <figcaption>Terminal — docker run <span>saída da aplicação</span></figcaption>
+        <pre><span class="pr">PS C:\Users\Instrutor\Aula05_EX1_Nuvem\atividade-produtos&gt;</span> <span class="cm">docker run --rm java-produtos</span>
+
+=== ESTOQUE DA LOJA ===
+
+Produto: Notebook
+Preço: R$ 3500.00
+Quantidade: 5
+
+Produto: Mouse sem fio
+Preço: R$ 89.90
+Quantidade: 40
+
+Produto: Monitor 24 polegadas
+Preço: R$ 1250.50
+Quantidade: 12</pre>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">ATIVIDADE 2</span> CTI Insights</h2>
+    <p>Aqui o domínio tem seis classes que se referenciam por composição: um objeto guarda outro como atributo, e é essa cadeia de referências que a <code>Main</code> monta antes de exibir as informações.</p>
+
+    <div class="diagrama">
+      <svg viewBox="0 0 700 200" role="img" aria-label="Diagrama de relacionamentos: Cliente referencia Consultor; Contrato referencia Cliente e Servico; Insight referencia Contrato; Telemetria referencia Servico.">
+        <defs>
+          <marker id="seta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="dhead"/>
+          </marker>
+        </defs>
+
+        <rect class="dbox" x="10" y="20" width="120" height="40"/>
+        <text class="dtxt" x="70" y="45" text-anchor="middle">Consultor</text>
+
+        <rect class="dbox" x="190" y="20" width="120" height="40"/>
+        <text class="dtxt" x="250" y="45" text-anchor="middle">Cliente</text>
+
+        <rect class="dbox" x="370" y="20" width="120" height="40"/>
+        <text class="dtxt" x="430" y="45" text-anchor="middle">Contrato</text>
+
+        <rect class="dbox" x="550" y="20" width="120" height="40"/>
+        <text class="dtxt" x="610" y="45" text-anchor="middle">Insight</text>
+
+        <rect class="dbox" x="370" y="130" width="120" height="40"/>
+        <text class="dtxt" x="430" y="155" text-anchor="middle">Servico</text>
+
+        <rect class="dbox" x="550" y="130" width="120" height="40"/>
+        <text class="dtxt" x="610" y="155" text-anchor="middle">Telemetria</text>
+
+        <line class="dlink" x1="188" y1="40" x2="136" y2="40" marker-end="url(#seta)"/>
+        <text class="dlbl" x="162" y="32" text-anchor="middle">consultor</text>
+
+        <line class="dlink" x1="368" y1="40" x2="316" y2="40" marker-end="url(#seta)"/>
+        <text class="dlbl" x="342" y="32" text-anchor="middle">cliente</text>
+
+        <line class="dlink" x1="548" y1="40" x2="496" y2="40" marker-end="url(#seta)"/>
+        <text class="dlbl" x="522" y="32" text-anchor="middle">contrato</text>
+
+        <line class="dlink" x1="430" y1="62" x2="430" y2="126" marker-end="url(#seta)"/>
+        <text class="dlbl" x="440" y="99">servico</text>
+
+        <line class="dlink" x1="548" y1="150" x2="496" y2="150" marker-end="url(#seta)"/>
+        <text class="dlbl" x="522" y="142" text-anchor="middle">servico</text>
+      </svg>
+    </div>
+    <p class="sub">A seta aponta da classe que <em>possui</em> o atributo para a classe <em>referenciada</em>. É por isso que o insight alcança o cliente indiretamente: <code>insight → contrato → cliente → consultor</code>.</p>
+
+    <div class="bloco">
+      <h3>Estrutura de arquivos</h3>
+      <pre class="tree"><b>atividade-cti-insights/</b>
+│
+├── Consultor.java
+├── Cliente.java
+├── Contrato.java
+├── Servico.java
+├── Telemetria.java
+├── Insight.java
+├── Main.java
+└── Dockerfile</pre>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">a)</span>Consultor</h3>
+      <figure class="arquivo">
+        <figcaption>Consultor.java</figcaption>
+        <pre>public class Consultor {
+
+    String nome;
+    String matricula;
+
+    public Consultor(String nome, String matricula) {
+        this.nome = nome;
+        this.matricula = matricula;
+    }
+
+    public void exibirInformacoes() {
+        System.out.println("--- CONSULTOR ---");
+        System.out.println("Consultor: " + nome);
+        System.out.println("Matrícula: " + matricula);
+        System.out.println();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">b)</span>Cliente</h3>
+      <p class="sub">Primeira classe com relacionamento: guarda um objeto <code>Consultor</code> inteiro como atributo e, ao exibir, lê o nome diretamente desse objeto associado.</p>
+      <figure class="arquivo">
+        <figcaption>Cliente.java</figcaption>
+        <pre>public class Cliente {
+
+    String codigo;
+    String segmento;
+    String nivelAtendimento;
+    Consultor consultor;
+
+    public Cliente(String codigo, String segmento, String nivelAtendimento, Consultor consultor) {
+        this.codigo = codigo;
+        this.segmento = segmento;
+        this.nivelAtendimento = nivelAtendimento;
+        this.consultor = consultor;
+    }
+
+    public void exibirInformacoes() {
+        System.out.println("--- CLIENTE ---");
+        System.out.println("Cliente: " + codigo);
+        System.out.println("Segmento: " + segmento);
+        System.out.println("Nível de atendimento: " + nivelAtendimento);
+        System.out.println("Consultor responsável: " + consultor.nome);
+        System.out.println();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">c)</span>Servico</h3>
+      <figure class="arquivo">
+        <figcaption>Servico.java</figcaption>
+        <pre>public class Servico {
+
+    String nome;
+    String categoria;
+
+    public Servico(String nome, String categoria) {
+        this.nome = nome;
+        this.categoria = categoria;
+    }
+
+    public void exibirInformacoes() {
+        System.out.println("--- SERVIÇO ---");
+        System.out.println("Serviço: " + nome);
+        System.out.println("Categoria: " + categoria);
+        System.out.println();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">d)</span>Contrato</h3>
+      <p class="sub">Une as duas pontas do negócio: de um lado o cliente, do outro o serviço contratado.</p>
+      <figure class="arquivo">
+        <figcaption>Contrato.java</figcaption>
+        <pre>public class Contrato {
+
+    String dataInicio;
+    String status;
+    Cliente cliente;
+    Servico servico;
+
+    public Contrato(String dataInicio, String status, Cliente cliente, Servico servico) {
+        this.dataInicio = dataInicio;
+        this.status = status;
+        this.cliente = cliente;
+        this.servico = servico;
+    }
+
+    public void exibirInformacoes() {
+        System.out.println("--- CONTRATO ---");
+        System.out.println("Data de início: " + dataInicio);
+        System.out.println("Status: " + status);
+        System.out.println("Cliente: " + cliente.codigo);
+        System.out.println("Serviço: " + servico.nome);
+        System.out.println();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">e)</span>Telemetria</h3>
+      <figure class="arquivo">
+        <figcaption>Telemetria.java</figcaption>
+        <pre>public class Telemetria {
+
+    String evento;
+    String status;
+    String timestamp;
+    Servico servico;
+
+    public Telemetria(String evento, String status, String timestamp, Servico servico) {
+        this.evento = evento;
+        this.status = status;
+        this.timestamp = timestamp;
+        this.servico = servico;
+    }
+
+    public void exibirInformacoes() {
+        System.out.println("--- TELEMETRIA ---");
+        System.out.println("Evento: " + evento);
+        System.out.println("Status: " + status);
+        System.out.println("Timestamp: " + timestamp);
+        System.out.println("Serviço: " + servico.nome);
+        System.out.println();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">f)</span>Insight</h3>
+      <figure class="arquivo">
+        <figcaption>Insight.java</figcaption>
+        <pre>public class Insight {
+
+    String tipo;
+    String descricao;
+    String geradoEm;
+    Contrato contrato;
+
+    public Insight(String tipo, String descricao, String geradoEm, Contrato contrato) {
+        this.tipo = tipo;
+        this.descricao = descricao;
+        this.geradoEm = geradoEm;
+        this.contrato = contrato;
+    }
+
+    public void exibirInformacoes() {
+        System.out.println("--- INSIGHT ---");
+        System.out.println("Tipo: " + tipo);
+        System.out.println("Descrição: " + descricao);
+        System.out.println("Gerado em: " + geradoEm);
+        System.out.println();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">g)</span>Main — criação dos objetos e dos relacionamentos</h3>
+      <p class="sub">A ordem de criação segue a cadeia de dependências: nenhum objeto pode ser instanciado antes daquele que ele recebe no construtor.</p>
+      <figure class="arquivo">
+        <figcaption>Main.java</figcaption>
+        <pre>public class Main {
+
+    public static void main(String[] args) {
+
+        System.out.println("=== CTI INSIGHTS ===");
+        System.out.println();
+
+        // Criação dos objetos e dos relacionamentos entre eles
+        Consultor consultor = new Consultor("Rafael Barbosa", "CON-0089");
+
+        Cliente cliente = new Cliente("CLI-001", "Indústria", "Premium", consultor);
+
+        Servico servico = new Servico("Monitoramento de Máquinas", "Telemetria Industrial");
+
+        Contrato contrato = new Contrato("04/09/2026", "Ativo", cliente, servico);
+
+        Telemetria telemetria = new Telemetria("Leitura de temperatura", "Sucesso",
+                "04/09/2026 15:30", servico);
+
+        Insight insight = new Insight("Alerta", "Temperatura acima da média",
+                "04/09/2026 15:31", contrato);
+
+        // Exibição das informações de cada objeto
+        consultor.exibirInformacoes();
+        cliente.exibirInformacoes();
+        servico.exibirInformacoes();
+        contrato.exibirInformacoes();
+        telemetria.exibirInformacoes();
+        insight.exibirInformacoes();
+    }
+}</pre>
+      </figure>
+    </div>
+
+    <div class="bloco">
+      <h3><span class="letra">h)</span>Dockerfile e execução da imagem</h3>
+      <p class="sub">Como agora são sete arquivos, o <code>COPY</code> e o <code>javac</code> usam o coringa <code>*.java</code> — o compilador resolve sozinho a ordem de dependência entre as classes.</p>
+      <figure class="arquivo">
+        <figcaption>Dockerfile <span>Receita da imagem</span></figcaption>
+        <pre># Imagem base com o JDK 21
+FROM eclipse-temurin:21-jdk
+
+# Diretorio de trabalho dentro do container
+WORKDIR /app
+
+# Copia todos os arquivos .java para dentro da imagem
+COPY *.java ./
+
+# Compila todas as classes durante a construcao da imagem
+RUN javac -encoding UTF-8 *.java
+
+# Comando executado quando o container e iniciado
+CMD ["java", "-Dstdout.encoding=UTF-8", "Main"]</pre>
+      </figure>
+      <figure class="arquivo term">
+        <figcaption>Terminal — build e execução <span>java-cti-insights</span></figcaption>
+        <pre><span class="pr">PS C:\...\atividade-cti-insights&gt;</span> <span class="cm">docker build -t java-cti-insights .</span>
+
+<span class="dim">#7 [3/4] COPY *.java ./
+#8 [4/4] RUN javac -encoding UTF-8 *.java
+#9 exporting manifest list sha256:39f7bd133c5cd109f84035583e483594...</span>
+#9 naming to docker.io/library/java-cti-insights:latest done
+#9 DONE 3.2s
+
+<span class="pr">PS C:\...\atividade-cti-insights&gt;</span> <span class="cm">docker run --rm java-cti-insights</span>
+
+=== CTI INSIGHTS ===
+
+--- CONSULTOR ---
+Consultor: Rafael Barbosa
+Matrícula: CON-0089
+
+--- CLIENTE ---
+Cliente: CLI-001
+Segmento: Indústria
+Nível de atendimento: Premium
+Consultor responsável: Rafael Barbosa
+
+--- SERVIÇO ---
+Serviço: Monitoramento de Máquinas
+Categoria: Telemetria Industrial
+
+--- CONTRATO ---
+Data de início: 04/09/2026
+Status: Ativo
+Cliente: CLI-001
+Serviço: Monitoramento de Máquinas
+
+--- TELEMETRIA ---
+Evento: Leitura de temperatura
+Status: Sucesso
+Timestamp: 04/09/2026 15:30
+Serviço: Monitoramento de Máquinas
+
+--- INSIGHT ---
+Tipo: Alerta
+Descrição: Temperatura acima da média
+Gerado em: 04/09/2026 15:31</pre>
+      </figure>
+      <figure class="arquivo term">
+        <figcaption>Terminal — imagens geradas <span>docker images</span></figcaption>
+        <pre><span class="pr">PS C:\Users\Instrutor\Aula05_EX1_Nuvem&gt;</span> <span class="cm">docker images</span>
+
+REPOSITORY                 IMAGE ID            SIZE
+java-cti-insights:latest   39f7bd133c5c        721MB
+java-produtos:latest       ffdeb2fc4c28        721MB</pre>
+      </figure>
+      <div class="cks">
+        <div class="ck"><b>OK</b><span>A saída do container da Atividade 2 corresponde integralmente ao resultado esperado no enunciado.</span></div>
+        <div class="ck"><b>OK</b><span>As duas imagens foram construídas e executadas sem erro de compilação.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="num">QUESTÕES</span> Conceitos aplicados</h2>
+    <div class="qa">
+
+      <div class="q">
+        <h3><span class="n">1</span>Qual é a função do comando <code>docker build</code>?</h3>
+        <p>Ele lê o <code>Dockerfile</code> e o contexto de build (a pasta indicada no fim do comando, aqui o ponto) e executa as instruções na ordem em que aparecem, gerando uma camada a cada uma delas. O produto final é uma imagem pronta, armazenada localmente. A opção <code>-t</code> dá o nome pelo qual essa imagem passa a ser chamada — foi assim que <code>java-produtos</code> e <code>java-cti-insights</code> surgiram.</p>
+      </div>
+
+      <div class="q">
+        <h3><span class="n">2</span>Qual é a diferença entre uma imagem Docker e um container Docker?</h3>
+        <p>A imagem é o pacote pronto e imutável — um sistema de arquivos em camadas com o JDK 21 e os <code>.class</code> já compilados, mais a instrução de inicialização. Ela não executa nada sozinha; fica guardada, como um molde.</p>
+        <p>O container é uma instância em execução dessa imagem: o Docker acrescenta uma camada de escrita por cima e roda o processo isolado do restante do sistema. Uma mesma imagem pode originar vários containers simultâneos e independentes e, ao encerrar o container (com <code>--rm</code>, que o apaga), a imagem permanece intacta para o próximo <code>docker run</code>.</p>
+      </div>
+
+      <div class="q">
+        <h3><span class="n">3</span>Para que serve a instrução <code>FROM</code> dentro do Dockerfile?</h3>
+        <p>Define a imagem base sobre a qual todas as demais camadas são empilhadas e, por isso, é a primeira instrução do arquivo. Nestas atividades, <code>FROM eclipse-temurin:21-jdk</code> entrega um Linux que já vem com o JDK 21 instalado — é o que permite chamar <code>javac</code> e <code>java</code> nas instruções seguintes sem instalar nada manualmente.</p>
+      </div>
+
+      <div class="q">
+        <h3><span class="n">4</span>Qual é a função do comando <code>COPY</code> no Dockerfile?</h3>
+        <p>Copia arquivos e pastas do contexto de build, na máquina host, para dentro do sistema de arquivos da imagem. Sem ele o código-fonte simplesmente não existiria lá dentro: <code>COPY *.java ./</code> leva os sete arquivos da CTI Insights para o <code>/app</code> definido no <code>WORKDIR</code>, onde o <code>javac</code> vai encontrá-los.</p>
+      </div>
+
+      <div class="q">
+        <h3><span class="n">5</span>Qual é a vantagem de executar um programa Java dentro de um container em vez de depender do Java instalado no computador?</h3>
+        <p>Porque a versão do Java deixa de ser uma característica da máquina e passa a fazer parte da própria aplicação:</p>
+        <ul>
+          <li><strong>Reprodutibilidade</strong> — a imagem carrega o JDK 21 exato, então o programa roda igual no notebook do aluno, no computador do professor e no servidor, eliminando o clássico "na minha máquina funciona".</li>
+          <li><strong>Sem conflito de versões</strong> — não importa se o host tem Java 8, Java 17 ou nenhum Java, nem como o <code>JAVA_HOME</code> está configurado.</li>
+          <li><strong>Isolamento</strong> — o processo roda em ambiente separado, sem interferir em outras aplicações da máquina nem sofrer interferência delas.</li>
+          <li><strong>Portabilidade</strong> — a mesma imagem pode ser enviada a um registry e executada em qualquer host com Docker, o que é justamente a base para publicá-la em nuvem.</li>
+          <li><strong>Descarte fácil</strong> — encerrado o container, a máquina fica exatamente como estava antes.</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <span>Computação em Nuvem &middot; Aula 05 &middot; Exercícios 1 e 2</span>
+    <span>Prof. Me. Daniel Vieira &middot; SENAI</span>
+  </footer>
+
+</div>
